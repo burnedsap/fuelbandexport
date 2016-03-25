@@ -5,7 +5,7 @@ import urllib
 import urllib2
 import time
 
-ACCESS_TOKEN = 'YOUR_ACCESS_TOKEN'
+ACCESS_TOKEN = 'X3xt4BCwj3PYK65Xkjr9kRjJpn0W'
  
 base_url = 'https://api.nike.com'
 url = '/me/sport/activities/FUELBAND?access_token=%s&experienceType=FUELBAND' % ACCESS_TOKEN
@@ -14,7 +14,7 @@ current_month = None
 emotion = ''
 note = ''
 
-file = open('fuelband.txt','w+')
+file = open('fuelband1.txt','w+')
 
 while url:
  
@@ -39,7 +39,22 @@ while url:
 				#print '--', current_month, '--'
 				file.write('--' + current_month + '--\n')
 			
+			# distance calculation
 			metrics = activity.get('metricSummary')
+			kilom = metrics.get('distance')
+			distance = '%.2f' % round(kilom, 2)
+			
+			# remove milliseconds
+			duration = metrics.get('duration').partition('.')[0]
+			
+			pace = ''
+			sp = duration.split(':')
+			if (len(sp) == 3):
+				duration_seconds = int(sp[0]) * 60 * 60 + int(sp[1]) * 60 + int(sp[2])
+				seconds_per_kilom = duration_seconds / kilom
+				hours, remainder = divmod(seconds_per_kilom, 3600)
+				minutes, seconds = divmod(remainder, 60)
+				pace = '(%.0f\'%02.0f/km)' % (minutes, seconds)
 
 			calories = metrics.get('calories')
 			fuel = metrics.get('fuel')
@@ -51,13 +66,11 @@ while url:
 				if (tag.get('tagType') == "NOTE") and (tag.get('tagValue') != "NOTE"):
 					note = tag.get('tagValue')
 
-			# remove milliseconds
-			duration = metrics.get('duration').partition('.')[0]
-
 			if activity.get('activityType') == "ALL_DAY": 
-				file.write(date + ' : fuel: ' + str(fuel).ljust(6) + '\tcalories: ' +  str(calories).ljust(6) + '\tactive: '  + duration.ljust(8) + '\t' + emotion.ljust(12) + '\t' + note + ' ' + '\n')
+				file.write(date + ' : distance: ' + str(distance).ljust(5) + 'km' + '\tpace: ' + str(pace).ljust(10) + '\tfuel: ' + str(fuel).ljust(5) + '\tcalories: ' +  str(calories).ljust(5) + '\tactive: '  + duration.ljust(5) + '\t' + emotion.ljust(5) + '\t' + note + ' ' + '\n')
 				emotion = '' 
 				note = ''
+				
 	# pagination
 	url = None
 	if resp.get('paging') and resp.get('paging').get('next'):
