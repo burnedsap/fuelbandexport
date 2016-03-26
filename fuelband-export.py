@@ -5,7 +5,7 @@ import urllib
 import urllib2
 import time
 
-ACCESS_TOKEN = 'X3xt4BCwj3PYK65Xkjr9kRjJpn0W'
+ACCESS_TOKEN = 'ACCESS CODE FROM NIKE'
  
 base_url = 'https://api.nike.com'
 url = '/me/sport/activities/FUELBAND?access_token=%s&experienceType=FUELBAND' % ACCESS_TOKEN
